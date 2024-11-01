@@ -1,0 +1,57 @@
+class Stock {
+    name: string;
+
+    constructor(name: string) {
+        this.name = name;
+    }
+
+    // Mock Price method for this example
+    Price(date: Date): number {
+        // In a real implementation, this would fetch the stock's historical price for the given date
+        // Here, we're just returning a mock price for simplicity
+        return Math.random() * 100;
+    }
+}
+
+class Portfolio {
+    stocks: Stock[];
+
+    constructor(stocks: Stock[]) {
+        this.stocks = stocks;
+    }
+
+    Profit(startDate: Date, endDate: Date): number {
+        let initialTotal = 0;
+        let finalTotal = 0;
+
+        this.stocks.forEach(stock => {
+            initialTotal += stock.Price(startDate);
+            finalTotal += stock.Price(endDate);
+        });
+
+        return finalTotal - initialTotal;
+    }
+
+    annualizedReturn(startDate: Date, endDate: Date): number {
+        const profit = this.Profit(startDate, endDate);
+        const initialTotal = this.stocks.reduce((sum, stock) => sum + stock.Price(startDate), 0);
+        const yearsElapsed = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 365);
+
+        const totalReturn = (initialTotal + profit) / initialTotal;
+        const annualizedReturn = Math.pow(totalReturn, 1 / yearsElapsed) - 1;
+
+        return annualizedReturn * 100; // returning as a percentage
+    }
+}
+
+// Example usage:
+const stockA = new Stock("AAPL");
+const stockB = new Stock("GOOGL");
+const portfolio = new Portfolio([stockA, stockB]);
+
+const startDate = new Date("2020-01-01");
+const endDate = new Date("2023-01-01");
+
+console.log("Portfolio Profit:", portfolio.Profit(startDate, endDate));
+console.log("Portfolio Annualized Return:", portfolio.annualizedReturn(startDate, endDate), "%");
+
